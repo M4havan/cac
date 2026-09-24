@@ -1,0 +1,25 @@
+// server.js
+const express = require('express');
+const axios = require('axios');
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.get('/resolve-cac/:code', async (req, res) => {
+    try {
+        const outfitCode = req.params.code;
+        
+        // This asks the public catalog database for the outfit data
+        const response = await axios.get(`https://rapidapi.com{outfitCode}`, {
+            headers: { 
+                'X-RapidAPI-Key': 'YOUR_RAPIDAPI_CATALOG_KEY' // Your secret API key
+            }
+        });
+        
+        // This sends the clean list of Roblox item IDs straight back to your Roblox game script
+        res.json(response.data.assetIds); 
+    } catch (error) {
+        res.status(500).json({ error: "Failed to resolve outfit code" });
+    }
+});
+
+app.listen(PORT, () => console.log(`Proxy running on port ${PORT}`));
